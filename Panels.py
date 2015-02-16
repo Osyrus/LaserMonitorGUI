@@ -10,14 +10,14 @@ class PanelManager(object):
 
         self.columns = 2
 
-        self.nextColumn = 1
-        self.nextRow = 1
+        self.nextColumn = 0
+        self.nextRow = 0
 
     def moveToNextPos(self):
         self.nextColumn += 1
 
-        if self.nextColumn > self.columns:
-            self.nextColumn = 1
+        if self.nextColumn > (self.columns - 1):
+            self.nextColumn = 0
             self.nextRow += 1
 
     def addSensorPanel(self, sensor, mqttClient):
@@ -40,24 +40,36 @@ class SensorPanel(object):
         self.log = tk.StringVar()
         self.log.set("0")
 
-        self.frame = ttk.Frame(parentFrame, padding="3 3", borderwidth="2", relief="raised")
+        self.frame = ttk.Frame(parentFrame, padding="3 3 12 12", borderwidth="2", relief="raised")
 
-        self.title = ttk.Label(self.frame, text=self.info[0])
-        self.title.grid(column=1, row=1, sticky=(tk.E, tk.W))
+        self.frame.columnconfigure(0, weight=1)
+        self.frame.columnconfigure(1, weight=1)
+        self.frame.columnconfigure(2, weight=1)
+        self.frame.columnconfigure(3, weight=1)
 
-        self.paramDisplay = ttk.Label(self.frame, text=self.info[1])
-        self.paramDisplay.grid(column=5, row=1, sticky=(tk.E, tk.W))
+        self.title = ttk.Label(self.frame, text=self.info[0], style='Info.TLabel')
 
+        self.paramDisplay = ttk.Label(self.frame, text=self.info[1], style='Info.TLabel', anchor="e")
+        
         self.dataStr = tk.StringVar()
-        self.dataStr.set("Waiting...")
-        self.dataDisplay = ttk.Label(self.frame, textvariable=self.dataStr, justify="center")
-        self.dataDisplay.grid(column=1, row=2, sticky=(tk.N, tk.W, tk.E, tk.S))
+        self.dataStr.set("Waiting... ")
+        self.dataDisplay = ttk.Label(self.frame, textvariable=self.dataStr, style='Data.TLabel', anchor="e")
+        
+        self.dataUnitDisplay = ttk.Label(self.frame, text=self.info[2], style='Data.TLabel', anchor="w")
 
         self.logCheck = ttk.Checkbutton(self.frame, text="Log", variable=self.log)
-        self.logCheck.grid(column=1, row=3, sticky=(tk.E, tk.W))
 
-        self.topicDisplay = ttk.Label(self.frame, text=self.topic)
-        self.topicDisplay.grid(column=3, row=3, sticky=(tk.E, tk.W))
+        self.topicDisplay = ttk.Label(self.frame, text=self.topic, style='Info.TLabel', anchor="e")
+
+        self.title.grid(column=0, row=0, sticky=(tk.E, tk.W), columnspan=3, padx=5, pady=5)
+        self.paramDisplay.grid(column=3, row=0, sticky=(tk.E, tk.W), padx=5, pady=5)
+        self.dataDisplay.grid(column=0, row=1, sticky=(tk.N, tk.W, tk.E, tk.S), columnspan = 3, padx=5, pady=5)
+        self.dataUnitDisplay.grid(column=3, row=1, sticky=(tk.N, tk.W, tk.E, tk.S), padx=5, pady=5)
+        self.logCheck.grid(column=0, row=2, sticky=(tk.E, tk.W), padx=5, pady=5)
+        self.topicDisplay.grid(column=1, row=2, sticky=(tk.E, tk.W), padx=5, pady=5)
+
+        # ttk.Sizegrip(self.frame).grid(column=3, row=3, sticky=(tk.S, tk.E))
+
 
     def mqttCallback(self, client, userdata, message):
         payload = message.payload.decode('utf-8')
@@ -67,7 +79,7 @@ class SensorPanel(object):
         timestamp = splitMessage[0]
         data = float(splitMessage[1])
 
-        self.dataStr.set("{0:02.02f} ".format(data) + self.info[2])
+        self.dataStr.set("{0:02.02f} ".format(data) + " ")
 
     def getTopic(self):
         return self.topic

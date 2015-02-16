@@ -5,15 +5,24 @@ import Panels
 
 rootWindow = tk.Tk()
 rootWindow.title("MQTT Laser Monitor")
+rootWindow.columnconfigure(0, weight=1)
+rootWindow.rowconfigure(0, weight=1)
 
 mainframe = ttk.Frame(rootWindow, padding="3 3 12 12")
 mainframe.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
 mainframe.columnconfigure(0, weight=1)
 mainframe.rowconfigure(0, weight=1)
 
+ttk.Sizegrip().grid(column=1, row=1, sticky=(tk.S, tk.E))
+
 client = mqtt.Client()
 client.connect("10.32.98.69", 1883, 60)
 client.loop_start();
+
+s = ttk.Style()
+s.configure('Info.TLabel', font='helvetica 16')
+s.configure('Data.TLabel', font='helvetica 24')
+s.configure('TCheckbutton', font='helvetica 16')
 
 PM = Panels.PanelManager()
 
