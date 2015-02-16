@@ -10,7 +10,7 @@ class LoggingMenu(object):
         self.PM = panelManager
         self.logfile = None
 
-        self.frame = ttk.Frame(parentFrame, padding="3 3 12 12", borderwidth="2", relief="raised")
+        self.frame = ttk.LabelFrame(parentFrame, padding="3 3 12 12", borderwidth="2", relief="raised", text="Log Menu")
         self.frame.grid(column=0, row=0, sticky=(tk.E, tk.W), columnspan=2)
 
         self.frame.columnconfigure(0, weight=1)

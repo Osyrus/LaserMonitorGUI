@@ -11,7 +11,7 @@ class PanelManager(object):
         self.columns = 2
 
         self.nextColumn = 0
-        self.nextRow = 1
+        self.nextRow = 0
 
     def moveToNextPos(self):
         self.nextColumn += 1
