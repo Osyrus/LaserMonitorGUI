@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter import filedialog
 
 class LoggingMenu(object):
     """docstring for LoggingMenu"""
@@ -17,10 +18,13 @@ class LoggingMenu(object):
         self.frame.columnconfigure(2, weight=1)
         self.frame.columnconfigure(3, weight=1)
 
-        self.title = ttk.Label(self.frame, text="Logging filename: ", style='Info.TLabel')
+        self.title = ttk.Label(self.frame, text="Logging filename: ", style='Info.TLabel', anchor = "e")
 
-        self.filename = tk.StringVar()
-        self.filenameEntry = ttk.Entry(self.frame, textvariable=self.filename)
+        self.filename = None
+        self.filenameShort = tk.StringVar()
+        self.filenameShort.set("Set filename ...")
+        self.filenameDisplay = ttk.Label(self.frame, textvariable=self.filenameShort, anchor="w", style='Info.TLabel')
+        self.filenameSelect = ttk.Button(self.frame, text="...", command=self.selectLogfile)
 
         self.startButton = ttk.Button(self.frame, text="Start", command=self.startLogfile)
         self.stopButton = ttk.Button(self.frame, text="Stop", command=self.closeLogfile)
@@ -29,19 +33,24 @@ class LoggingMenu(object):
         self.progress = ttk.Progressbar(self.frame, orient=tk.HORIZONTAL, mode='indeterminate')
 
         self.title.grid(column=0, row=0, sticky=(tk.E, tk.W), padx=5, pady=5, rowspan=2)
-        self.filenameEntry.grid(column=1, row=0, sticky=(tk.E, tk.W), padx=5, pady=5, rowspan=2)
-        self.startButton.grid(column=2, row=0, sticky=(tk.E, tk.W), padx=5, pady=5)
-        self.stopButton.grid(column=3, row=0, sticky=(tk.E, tk.W), padx=5, pady=5)
-        self.progress.grid(column=2, row=1, sticky=(tk.E, tk.W), padx=5, pady=5, columnspan=2)
+        self.filenameDisplay.grid(column=1, row=0, sticky=(tk.E, tk.W), padx=5, pady=5, rowspan=2)
+        self.filenameSelect.grid(column=2, row=0, sticky=(tk.E, tk.W), padx=5, pady=5, rowspan=2)
+        self.startButton.grid(column=3, row=0, sticky=(tk.E, tk.W), padx=5, pady=5)
+        self.stopButton.grid(column=4, row=0, sticky=(tk.E, tk.W), padx=5, pady=5)
+        self.progress.grid(column=3, row=1, sticky=(tk.E, tk.W), padx=5, pady=5, columnspan=2)
+
+    def selectLogfile(self):
+        self.filename = filedialog.asksaveasfilename(parent=self.frame, defaultextension=".log", initialfile="logfile")
+        self.filenameShort.set(self.filename.split("/")[-1])
 
     def startLogfile(self):
-        if self.filename.get() is not "":
+        if self.filename is not None and self.filename is not "":
             if self.PM.sensorToLog():
-                print("Log with file: " + self.filename.get() + ".log")
+                print("Log with file: " + self.filenameShort.get())
                 self.progress.start()
 
                 try:
-                    self.logfile = open(self.filename.get() + ".log", 'a')
+                    self.logfile = open(self.filename, 'a')
                 except:
                     raise
                 
