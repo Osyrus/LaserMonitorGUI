@@ -11,7 +11,7 @@ class PanelManager(object):
         self.columns = 2
 
         self.nextColumn = 0
-        self.nextRow = 0
+        self.nextRow = 1
 
     def moveToNextPos(self):
         self.nextColumn += 1
@@ -28,6 +28,21 @@ class PanelManager(object):
         mqttClient.message_callback_add(sensor.getTopic(), sensor.mqttCallback)
 
         self.sensors.append(sensor)
+
+    def startLogging(self, logfile):
+        for sensor in self.sensors:
+            if sensor.toLog():
+                sensor.logToFile(logfile)
+
+    def stopLogging(self):
+        for sensor in self.sensors:
+            sensor.stopLogging()
+
+    def sensorToLog(self):
+        for sensor in self.sensors:
+            if sensor.toLog():
+                return True
+        return False
         
 
 class SensorPanel(object):
@@ -37,8 +52,12 @@ class SensorPanel(object):
         
         self.info = sensorInfo
         self.topic = mqttTopic
+
         self.log = tk.StringVar()
         self.log.set("0")
+        self.logging = False
+        self.logfile = None
+        self.logID = sensorInfo[3]
 
         self.frame = ttk.Frame(parentFrame, padding="3 3 12 12", borderwidth="2", relief="raised")
 
@@ -76,8 +95,14 @@ class SensorPanel(object):
 
         splitMessage = payload.split(" ")
 
-        timestamp = splitMessage[0]
+        timestamp = float(splitMessage[0])
         data = float(splitMessage[1])
+
+        if self.logging:
+            try:
+                self.logfile.write(self.logID + " " + str(timestamp) + " " + str(data) + "\n")
+            except:
+                raise
 
         self.dataStr.set("{0:02.02f} ".format(data) + " ")
 
@@ -86,3 +111,17 @@ class SensorPanel(object):
 
     def placeInGrid(self, gridPos):
         self.frame.grid(column=gridPos[0], row=gridPos[1], sticky=(tk.N, tk.W, tk.E, tk.S))
+
+    def toLog(self):
+        if self.log.get() == "0":
+            return False
+        elif self.log.get() == "1":
+            return True
+
+    def logToFile(self, logfile):
+        self.logging = True
+        self.logfile = logfile
+
+    def stopLogging(self):
+        self.logging = False
+        self.logfile = None
