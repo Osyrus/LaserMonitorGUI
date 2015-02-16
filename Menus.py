@@ -40,7 +40,8 @@ class LoggingMenu(object):
         self.progress.grid(column=3, row=1, sticky=(tk.E, tk.W), padx=5, pady=5, columnspan=2)
 
     def selectLogfile(self):
-        self.filename = filedialog.asksaveasfilename(parent=self.frame, defaultextension=".log", initialfile="logfile")
+        self.filename = filedialog.asksaveasfilename(parent=self.frame, defaultextension=".log", \
+            initialfile="logfile", title="Save logfile as...")
         self.filenameShort.set(self.filename.split("/")[-1])
 
     def startLogfile(self):
