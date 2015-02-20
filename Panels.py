@@ -29,6 +29,15 @@ class PanelManager(object):
 
         self.sensors.append(sensor)
 
+    def clearPanels(self):
+        for sensor in self.sensors:
+            sensor.delete()
+
+        self.sensors.clear()
+
+        self.nextColumn = 0
+        self.nextRow = 0
+
     def startLogging(self, logfile):
         for sensor in self.sensors:
             if sensor.toLog():
@@ -111,6 +120,9 @@ class SensorPanel(object):
 
     def placeInGrid(self, gridPos):
         self.frame.grid(column=gridPos[0], row=gridPos[1], sticky=(tk.N, tk.W, tk.E, tk.S))
+
+    def delete(self):
+        self.frame.destroy()
 
     def toLog(self):
         if self.log.get() == "0":
